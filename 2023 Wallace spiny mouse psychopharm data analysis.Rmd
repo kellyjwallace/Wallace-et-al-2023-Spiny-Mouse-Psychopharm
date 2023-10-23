@@ -1,0 +1,442 @@
+---
+title: "Wallace et al Psychopharm spiny mouse - October 2023"
+author: "Wallace"
+date: "10/19/2023"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+#get packages
+```{r}
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(viridis)
+library(EnvStats)
+library(ggbeeswarm)
+library(factoextra)
+library(jtools)
+library(cowlogdata)
+library(rstatix)
+library(vcd)
+library(effsize)
+```
+
+#get dataframes
+```{r}
+df<-read_csv("PLEASE INSERT PATH TO DATA FILE HERE")
+
+
+#list of measurements
+list<-colnames(df)
+list<-list[11:59] #removing categorical variables
+
+```
+
+#boxplots with dotplot overlay, graphs relevant to SPSS results
+#this section also averages for litter size and sex ratio (with graph for litter size comparison between treatment)
+```{r}
+
+#ssexp stimulus time by sex
+  dftemp<-df %>% select(sex, ssexp_stimulus_prop)
+  colnames(dftemp)<-c('sex', 'ssexp_stimulus_prop')
+  dftemp$sex<-as.factor(dftemp$sex)
+p<- ggplot(dftemp, aes(x=sex, y=ssexp_stimulus_prop)) +
+   geom_boxplot(lwd=1, fill = c("indianred3", "cornflowerblue"))+
+   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 1)+
+   theme_classic()+
+  theme(axis.text.y = element_text(size = 14)) + theme(axis.text.x = element_text(size = 14))+
+  stat_n_text()
+ plot(p)
+
+#ssexp stimulus time by treatment
+  dftemp<-df %>% select(treatment, ssexp_stimulus_prop)
+  colnames(dftemp)<-c('treatment', 'ssexp_stimulus_prop')
+  dftemp$treatment<-as.factor(dftemp$treatment)
+p<- ggplot(dftemp, aes(x=treatment, y=ssexp_stimulus_prop)) +
+   geom_boxplot(lwd=1, fill = c("aquamarine4", "darkgoldenrod3"))+
+   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 1)+
+   theme_classic()+
+   theme(axis.text.y = element_text(size = 14)) + theme(axis.text.x = element_text(size = 14))+
+  stat_n_text()
+ plot(p)
+
+
+#ls fos by treatment
+  dftemp<-df %>% select(treatment, ls_fos)
+  colnames(dftemp)<-c('treatment', 'ls_fos')
+  dftemp$treatment<-as.factor(dftemp$treatment)
+p<- ggplot(dftemp, aes(x=treatment, y=ls_fos)) +
+   geom_boxplot(lwd=1, fill = c("aquamarine4", "darkgoldenrod3"))+
+   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 1)+
+   theme_classic()+
+   theme(axis.text.y = element_text(size = 14)) + theme(axis.text.x = element_text(size = 14))+
+  stat_n_text()
+ plot(p)
+ 
+ 
+ #poa perk by treatment
+  dftemp<-df %>% select(treatment, poa_perk)
+  colnames(dftemp)<-c('treatment', 'poa_perk')
+  dftemp$treatment<-as.factor(dftemp$treatment)
+p<- ggplot(dftemp, aes(x=treatment, y=poa_perk)) +
+   geom_boxplot(lwd=1, fill = c("aquamarine4", "darkgoldenrod3"))+
+   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 1)+
+   theme_classic()+
+   theme(axis.text.y = element_text(size = 14)) + theme(axis.text.x = element_text(size = 14))+
+  stat_n_text()
+ plot(p)
+ 
+  #pvn perk by treatment
+  dftemp<-df %>% select(treatment, pvn_perk)
+  colnames(dftemp)<-c('treatment', 'pvn_perk')
+  dftemp$treatment<-as.factor(dftemp$treatment)
+p<- ggplot(dftemp, aes(x=treatment, y=pvn_perk)) +
+   geom_boxplot(lwd=1, fill = c("aquamarine4", "darkgoldenrod3"))+
+   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 1)+
+   theme_classic()+
+   theme(axis.text.y = element_text(size = 14)) + theme(axis.text.x = element_text(size = 14))+
+  stat_n_text()
+ plot(p)
+ 
+ 
+  #poa perk by sex
+  dftemp<-df %>% select(sex, pvn_perk)
+  colnames(dftemp)<-c('sex', 'pvn_perk')
+  dftemp$sex<-as.factor(dftemp$sex)
+p<- ggplot(dftemp, aes(x=sex, y=pvn_perk)) +
+   geom_boxplot(lwd=1, fill = c("indianred3", "cornflowerblue"))+
+   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 1)+
+   theme_classic()+
+   theme(axis.text.y = element_text(size = 14)) + theme(axis.text.x = element_text(size = 14))+
+  stat_n_text()
+ plot(p)
+ 
+ #mean litter size ALL
+ dftemp<-df[!duplicated(df$parents),]
+ print(mean(dftemp$littersize))
+ print(sd(dftemp$littersize))
+ 
+ #mean litter size SIMPLE
+ dftempsimple<-dftemp %>% filter(treatment == "simple")
+ print(mean(dftempsimple$littersize))
+ print(sd(dftempsimple$littersize))
+
+ 
+ #mean litter size COMPLEX
+ dftempcomplex<-dftemp %>% filter(treatment == "complex")
+ print(mean(dftempcomplex$littersize))
+ print(sd(dftempcomplex$littersize))
+
+ dftemp<-dftemp %>% select(parents, littersize, littersexratiomf)
+ 
+ preg_length<-c(49, 45, 45, 49, 42, 85, 40, 42, 38, 67, 48, 125, 152, 48)
+print(mean(preg_length))
+ print(sd(preg_length))
+ 
+ littersexratiolist<-c(0, 1, 0, 1, 1, 0, 2, 0, 1, 0, -1, 1, 1, 0)
+ print(mean(littersexratiolist))
+ print(sd(littersexratiolist))
+ shapiro.test(littersexratiolist) #significant, so use wilcoxon test
+ print(wilcox.test(littersexratiolist, mu = 0, alternative = "two.sided"))
+ dftemp<-data.frame(littersexratiolist)
+ 
+ wilcoxeffsize<- dftemp %>% wilcox_effsize(littersexratiolist ~ 1, mu = 0)
+ print(wilcoxeffsize)
+
+#stacked bar graph of litter size by treatment with chi squared test
+
+ littersizelist<-c(2, 3, 2, 3, 3, 2, 3, 2, 3, 2, 3, 2, 2, 2)
+ treatmentlist<- c("complex", "simple", "simple", "complex", "simple", "complex", "simple", "complex", "simple", "simple", "simple", "complex", "complex", "complex")  
+ 
+dftemp<-data.frame(littersizelist, treatmentlist)
+dftemp$littersizelist<-as.factor(dftemp$littersizelist)
+ 
+freq <- table(dftemp$treatmentlist, dftemp$littersizelist)
+
+#calculating effect size by hand using spss result:
+#φ = √(X2 / n)
+sqrt(4.667/14)
+
+ggplot(dftemp, aes(treatmentlist, fill = littersizelist)) + 
+    geom_bar() +
+    theme_classic()+
+    scale_fill_manual(values = c("slategrey","slategray3"))+
+    ggtitle("litter size by treatment chi squared")
+ 
+```
+
+#PCA of behavior by treatment and sex
+```{r}
+
+
+#Behavior PCA (not including two timepoint exposures, only behavioral profiling assays) by treatment
+
+templist<- c("ssb_total_aggression_prop", "ssb_total_prosocial_prop","osb_total_aggression_prop", "osb_total_prosocial_prop", "of_center_middle_prop", "nor_lower_middle_prop" )
+
+temp<-df %>% select(name, treatment, all_of(templist))
+temp$treatment<-as.factor(temp$treatment)
+
+temp<-na.omit(temp)
+temp.noname<-subset(temp,select = -c(name,treatment))
+res.pca <- prcomp(temp.noname, scale = TRUE)
+fviz_eig(res.pca, addlabels=TRUE) + ggtitle("BEHAVIOR PCA BY TREATMENT")
+fviz_pca_var(res.pca,
+             col.var = "black",
+             #gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE)+ ggtitle("BEHAVIOR PCA BY TREATMENT") +
+            theme(panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank())
+
+ pca <- prcomp(temp.noname, center = TRUE,scale = TRUE)
+ summary(pca)
+ assaybehavpca<-as.data.frame(pca$x)
+ assaybehavpca$name<-temp$name
+ assaybehavpca$treatment<-temp$treatment
+ pca.loadings <- pca$rotation
+ assaybehavpca<-assaybehavpca %>% select(PC1, PC2, name, treatment)
+
+p_value_PC1_treatment<-t.test(PC1~treatment, data = assaybehavpca, na.rm = TRUE)
+p_value_PC1_treatment<-as.numeric(p_value_PC1_treatment[3])
+assaybehavpca %>% cohens_d(PC1 ~ treatment)
+p_value_PC2_treatment<-t.test(PC2~treatment, data = assaybehavpca, na.rm = TRUE)
+p_value_PC2_treatment<-as.numeric(p_value_PC2_treatment[3])
+assaybehavpca %>% cohens_d(PC2 ~ treatment)
+
+
+ggplot(assaybehavpca, aes(x=PC1, y=PC2, color = treatment)) +
+  geom_point(size=6)+
+  scale_color_manual(values = c("aquamarine4", "darkgoldenrod3"))+
+  ggtitle(paste("BEHAVIOR PCA t-tests\n PC1 by treatment:", round(p_value_PC1_treatment, 3), 
+                "\n PC2 by treatment:", round(p_value_PC2_treatment, 3)))+
+  geom_hline(yintercept=0,linetype="longdash", color = "gray90")+
+  geom_vline(xintercept=0,linetype="longdash", color = "gray90")+
+  theme_classic()
+
+
+
+
+#Behavior PCA by sex
+
+templist<- c("ssb_total_aggression_prop", "ssb_total_prosocial_prop","osb_total_aggression_prop", "osb_total_prosocial_prop", "of_center_middle_prop", "nor_lower_middle_prop" )
+
+temp<-df %>% select(name, sex, all_of(templist))
+temp$sex<-as.factor(temp$sex)
+
+temp<-na.omit(temp)
+temp.noname<-subset(temp,select = -c(name,sex))
+res.pca <- prcomp(temp.noname, scale = TRUE)
+fviz_eig(res.pca, addlabels=TRUE) + ggtitle("BEHAVIOR PCA BY sex")
+fviz_pca_var(res.pca,
+             col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE)+ ggtitle("BEHAVIOR PCA BY sex")
+ pca <- prcomp(temp.noname, center = TRUE,scale = TRUE)
+ summary(pca)
+ assaybehavpca<-as.data.frame(pca$x)
+ assaybehavpca$name<-temp$name
+ assaybehavpca$sex<-temp$sex
+ pca.loadings <- pca$rotation
+ assaybehavpca<-assaybehavpca %>% select(PC1, PC2, name, sex)
+
+p_value_PC1_sex<-t.test(PC1~sex, data = assaybehavpca, na.rm = TRUE)
+p_value_PC1_sex<-as.numeric(p_value_PC1_sex[3])
+assaybehavpca %>% cohens_d(PC1 ~ sex)
+p_value_PC2_sex<-t.test(PC2~sex, data = assaybehavpca, na.rm = TRUE)
+p_value_PC2_sex<-as.numeric(p_value_PC2_sex[3])
+assaybehavpca %>% cohens_d(PC2 ~ sex)
+
+
+ggplot(assaybehavpca, aes(x=PC1, y=PC2, color = sex)) +
+  geom_point(size=6)+
+  scale_color_manual(values = c("violetred4", "skyblue3"))+
+  ggtitle(paste("BEHAVIOR PCA t-tests\n PC1 by sex:", round(p_value_PC1_sex, 3), 
+                "\n PC2 by sex:", round(p_value_PC2_sex, 3)))+
+  geom_hline(yintercept=0,linetype="longdash", color = "gray90")+
+  geom_vline(xintercept=0,linetype="longdash", color = "gray90")+
+  theme_classic()
+
+```
+
+#stacked bar graphs of time spent in various areas or doing certain behaviors for each of the four tasks (supp figure)
+#also includes OF-NOR repeated measures analysis f time spent in lower middle area
+```{r}
+#OF to NOR time spent in lower middle
+
+dftemp2<-df %>% select(of_lower_middle_prop, nor_lower_middle_prop, name, treatment)
+dftemp2$part<-"of"
+dftemp2<-rbind(dftemp2, dftemp2)
+
+
+dftemp2$part[35:68]<-"znor"
+dftemp2$of_lower_middle_prop[35:68]<-dftemp2$nor_lower_middle_prop[35:68]
+dftemp2<- dftemp2 %>% select(-nor_lower_middle_prop)
+colnames(dftemp2)<-c("lower_middle_prop", "name", "treatment","part")
+
+ggplot(dftemp2, aes(x = part, y = lower_middle_prop, group = name, color = treatment)) +
+    scale_color_manual(values = c("aquamarine4", "darkgoldenrod3"))+
+    geom_line(color = "gray90", lwd = 0.8) + geom_point(size = 4) + ggtitle("p < 0.001 SPSS")+ theme_classic()
+
+#this is just an average across all individuals because SPSS showed no treatment or sex effects
+
+###########OF
+
+cldata(pathtofile = "PLEASE INSERT PATH TO RAW SCORE SHEETS HERE /of", outputdataname = "dfof", outputzonename = "of_list_of_zones_original", factor = "FALSE")
+colnames(dfof) <- paste("of", colnames(dfof), sep = "_")
+of_list_of_zones <- paste("of", of_list_of_zones_original, sep = "_")
+
+i<-1
+for (i in 1:nrow(dfof)){
+  dfof$of_total_wall_prop[i]<-  dfof$of_left_wall_prop[i] + dfof$of_right_wall_prop[i] + dfof$of_upper_wall_prop[i] +    
+     dfof$of_lower_wall_prop[i]
+  dfof$of_total_arena_prop[i]<-dfof$of_lower_middle_prop[i] + 
+     dfof$of_lower_left_prop[i] +               
+     dfof$of_upper_middle_prop[i] +              
+     dfof$of_upper_right_prop[i] +              
+     dfof$of_upper_left_prop[i] +                
+     dfof$of_center_left_prop[i] +              
+     dfof$of_center_right_prop[i] +
+     dfof$of_lower_right_prop[i]}
+condition <- rep(c("wall" , "arena" , "center"))
+value <- c(mean(dfof$of_total_wall_prop),mean(dfof$of_total_arena_prop),mean(dfof$of_center_middle_prop))
+data <- data.frame(condition,value)
+
+ggplot(data, aes(fill=condition, y=value, x = 1)) + 
+    geom_bar(position="stack", stat="identity") +
+    theme_classic()+
+    scale_fill_manual(values = c("orangered4", "indianred3", "rosybrown3"))+
+    ggtitle("Open Field Zones 
+            (averaged across all)")
+
+
+
+
+
+
+############NOV
+
+
+cldata(pathtofile = "PLEASE INSERT PATH TO RAW SCORE SHEETS HERE /nor", outputdataname = "dfnor", outputzonename = "nor_list_nor_zones_original", factor = "FALSE")
+colnames(dfnor) <- paste("nor", colnames(dfnor), sep = "_")
+nor_list_nor_zones <- paste("nor", nor_list_nor_zones_original, sep = "_")
+
+i<-1
+for (i in 1:nrow(dfnor)){
+  dfnor$nor_total_wall_prop[i]<-  dfnor$nor_left_wall_prop[i] + dfnor$nor_right_wall_prop[i] + dfnor$nor_upper_wall_prop[i] +    
+     dfnor$nor_lower_wall_prop[i]
+  dfnor$nor_total_arena_prop[i]<-dfnor$nor_lower_middle_prop[i] + 
+     dfnor$nor_lower_left_prop[i] +               
+     dfnor$nor_upper_middle_prop[i] +              
+     dfnor$nor_upper_right_prop[i] +              
+     dfnor$nor_upper_left_prop[i] +                
+     dfnor$nor_center_left_prop[i] +              
+     dfnor$nor_center_right_prop[i] +
+     dfnor$nor_lower_right_prop[i]}
+condition <- rep(c("wall" , "arena" , "center"))
+value <- c(mean(dfnor$nor_total_wall_prop),mean(dfnor$nor_total_arena_prop),mean(dfnor$nor_center_middle_prop))
+data <- data.frame(condition,value)
+
+ggplot(data, aes(fill=condition, y=value, x = 1)) + 
+    geom_bar(position="stack", stat="identity") +
+    theme_classic()+
+    scale_fill_manual(values = c("slateblue4", "mediumpurple3", "thistle3"))+
+    ggtitle("NOVEL OBJECT Zones 
+            (averaged across all)")
+
+
+############SSB
+
+cldata(pathtofile = "PLEASE INSERT PATH TO RAW SCORE SHEETS HERE /ssb", outputdataname = "dfssb", outputzonename = "ssb_list_of_zones_original", factor = "FALSE")
+colnames(dfssb) <- paste("ssb", colnames(dfssb), sep = "_")
+
+i<-1
+for (i in 1:nrow(dfssb)){
+  dfssb$ssb_total_investigation_prop[i]<-dfssb$ssb_positive_investigation_prop[i] + dfssb$ssb_aggressive_investigation_prop[i] + dfssb$ssb_rearing_prop[i]}
+i<-1
+for (i in 1:nrow(dfssb)){
+  dfssb$ssb_total_prosocial_prop[i]<-dfssb$ssb_positive_side_by_side_contact_prop[i] + dfssb$ssb_huddling_prop[i] +  dfssb$ssb_allogrooming_prop[i]}
+i<-1
+for (i in 1:nrow(dfssb)){
+  dfssb$ssb_total_aggression_prop[i]<- dfssb$ssb_biting_prop[i] + dfssb$ssb_chasing_prop[i]+ dfssb$ssb_being_chased_prop[i] + dfssb$ssb_pinning_prop[i]}
+
+condition <- rep(c("neutral" , "aggression" , "prosocial", "interaction"))
+value <- c(mean(dfssb$ssb_neutral_prop),mean(dfssb$ssb_total_aggression_prop),mean(dfssb$ssb_total_prosocial_prop), mean(dfssb$ssb_total_investigation_prop))
+data <- data.frame(condition,value)
+
+ggplot(data, aes(fill=condition, y=value, x = 1)) + 
+    geom_bar(position="stack", stat="identity") +
+    theme_classic()+
+    scale_fill_manual(values = c("midnightblue", "royalblue3", "cornflowerblue", "lightskyblue1"))+
+    ggtitle("SSB Zones 
+            (averaged across all)")
+
+
+############OSB
+
+cldata(pathtofile = "PLEASE INSERT PATH TO RAW SCORE SHEETS HERE /osb", outputdataname = "dfosb", outputzonename = "osb_list_of_zones_original", factor = "FALSE")
+colnames(dfosb) <- paste("osb", colnames(dfosb), sep = "_")
+
+i<-1
+for (i in 1:nrow(dfosb)){
+  dfosb$osb_total_investigation_prop[i]<-dfosb$osb_positive_investigation_prop[i] + dfosb$osb_aggressive_investigation_prop[i] + dfosb$osb_rearing_prop[i]}
+i<-1
+for (i in 1:nrow(dfosb)){
+  dfosb$osb_total_prosocial_prop[i]<-dfosb$osb_positive_side_by_side_contact_prop[i] + dfosb$osb_huddling_prop[i] +  dfosb$osb_allogrooming_prop[i]}
+i<-1
+for (i in 1:nrow(dfosb)){
+  dfosb$osb_total_aggression_prop[i]<- dfosb$osb_biting_prop[i] + dfosb$osb_chasing_prop[i]+ dfosb$osb_being_chased_prop[i] + dfosb$osb_pinning_prop[i]}
+
+condition <- rep(c("neutral" , "aggression" , "prosocial", "interaction"))
+value <- c(mean(dfosb$osb_neutral_prop),mean(dfosb$osb_total_aggression_prop),mean(dfosb$osb_total_prosocial_prop), mean(dfosb$osb_total_investigation_prop))
+data <- data.frame(condition,value)
+
+ggplot(data, aes(fill=condition, y=value, x = 1)) + 
+    geom_bar(position="stack", stat="identity") +
+    theme_classic()+
+    scale_fill_manual(values = c("darkgreen", "forestgreen", "darkolivegreen3", "honeydew2"))+
+    ggtitle("osb Zones 
+            (averaged across all)")
+
+
+```
+
+#generating homecage graphs (stats from SPSS)
+```{r}
+
+#COMPARISON OF TREATMENT
+
+dfhome<-read_csv("PLEASE INSERT PATH TO RAW HOMECAGE DATA HERE")
+
+dfhome$littertreatment<-paste(dfhome$litter, dfhome$treatment, sep = "_")
+hometemp<-aggregate(cbind(parent_nursing, pup_self_grooming, pup_barrier_nose_poke, pup_barrier_traverse, parent_barrier_nose_poke, parent_barrier_traverse)~littertreatment,dfhome,mean)
+
+for (i in 1:nrow(hometemp)){
+hometemp$treatment[i]<-strsplit(toString(hometemp$littertreatment[i]), split = "_")[[1]][2]}
+
+homelist<-c("parent_nursing", "pup_self_grooming", "pup_barrier_nose_poke", "pup_barrier_traverse", "parent_barrier_nose_poke", "parent_barrier_traverse")
+
+i<-1
+for (i in 1:length(homelist)){
+  dftemp<-hometemp %>% select(treatment, homelist[i])
+  dftemp$treatment<-as.factor(dftemp$treatment)
+  colnames(dftemp)<-c('treatment', 'measurement')
+  shapiro<-shapiro.test(dftemp$measurement)
+
+p<- ggplot(dftemp, aes(x=treatment, y=measurement)) +
+   geom_boxplot(lwd=1, fill = c("gray75", "gray95"))+
+   theme_classic()+
+   labs(x= "treatment",y=homelist[i]) + theme(axis.text.y = element_text(size = 14)) + theme(axis.text.x = element_text(size = 14)) + ggtitle(homelist[i])+stat_n_text()
+ plot(p)}
+
+```
+
+
+
+
+
