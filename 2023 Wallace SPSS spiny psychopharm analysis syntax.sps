@@ -1149,3 +1149,28 @@ GLM of_lower_middle_prop nor_lower_middle_prop
   /PRINT=DESCRIPTIVE ETASQ 
   /CRITERIA=ALPHA(.05)
   /WSDESIGN=phase.
+
+
+
+DATASET ACTIVATE DataSet1.
+REGRESSION
+  /MISSING LISTWISE
+  /STATISTICS COEFF OUTS R ANOVA
+  /CRITERIA=PIN(.05) POUT(.10)
+  /NOORIGIN 
+  /DEPENDENT ls_fos
+  /METHOD=ENTER ssexp_stimulus_prop.
+
+* Chart Builder.
+GGRAPH
+  /GRAPHDATASET NAME="graphdataset" VARIABLES=ssexp_stimulus_prop ls_fos treatment MISSING=LISTWISE 
+    REPORTMISSING=NO
+  /GRAPHSPEC SOURCE=INLINE
+  /FITLINE TOTAL=YES SUBGROUP=NO.
+BEGIN GPL
+  GUIDE: axis(dim(1), label("ssexp_stimulus_prop"))
+  GUIDE: axis(dim(2), label("ls_fos"))
+  GUIDE: legend(aesthetic(aesthetic.color.interior), label("treatment"))
+  GUIDE: text.title(label("Scatter Plot of ls_fos by ssexp_stimulus_prop by treatment"))
+  ELEMENT: point(position(ssexp_stimulus_prop*ls_fos), color.interior(treatment))
+END GPL.
